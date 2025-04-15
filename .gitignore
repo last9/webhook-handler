@@ -6,10 +6,18 @@ node_example_msteams/yarn-error.log
 
 # Environment variables
 .env
-ruby_example_gchat/.env
-node_example_msteams/.env
-node_example_msteams/.env.local
-node_example_msteams/.env.*.local
+**/.env
+**/.env.*
+**/.env.local
+**/.env.*.local
+
+# Python virtual environment
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
 
 # Ruby specific (relative to ruby_example_gchat/)
 ruby_example_gchat/*.gem
@@ -46,11 +54,9 @@ dist/
 build/
 
 # Ruby specific
-ruby_example_jira/.env
 ruby_example_jira/.bundle/
 ruby_example_jira/vendor/
 ruby_example_jira/*.gem
-ruby_example_jira/*.gemfile.lock
 ruby_example_jira/.ruby-version
 ruby_example_jira/.ruby-gemset
 ruby_example_jira/.byebug_history

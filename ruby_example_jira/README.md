@@ -34,10 +34,21 @@ A Sinatra-based webhook handler that converts PagerDuty-style alerts into Jira i
    PORT=3000
    ```
 
+### Security Warning
+⚠️ **IMPORTANT**: 
+1. Never commit your `.env` file to version control. Add it to your `.gitignore` file:
+   ```bash
+   echo ".env" >> .gitignore
+   ```
+2. Store your Jira API token securely and rotate it regularly
+3. Use environment variables or a secrets management service in production
+4. Restrict access to the `.env` file using appropriate file permissions
+
    To get your Jira API token:
    1. Log in to https://id.atlassian.com/manage/api-tokens
    2. Click "Create API token"
    3. Give it a name and copy the token
+   4. Store the token securely - you won't be able to see it again
 
 ## Running the Server
 
@@ -146,28 +157,83 @@ The server will return appropriate error messages for:
 - Jira API errors
 - Authentication failures
 
-## Logging
 
-The server logs:
-- Received payloads
-- Jira API requests and responses
-- Error messages and stack traces
 
-## Security Considerations
+## Deployment on AWS EC2
 
-1. Keep your `.env` file secure and never commit it to version control
-2. Use HTTPS for production deployments
-3. Consider implementing request authentication
-4. Regularly rotate your Jira API token
+### Prerequisites
+- AWS account with EC2 access
+- AWS CLI installed and configured
+- SSH access to EC2 instances
+- Security group with port 3002 open (default port for this handler)
 
-## Contributing
+### Setup Steps
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+1. **Launch EC2 Instance**
+   ```bash
+   # Create a new EC2 instance (Ubuntu 20.04 recommended)
+   aws ec2 run-instances \
+     --image-id ami-0c55b159cbfafe1f0 \
+     --count 1 \
+     --instance-type t2.micro \
+     --key-name your-key-pair \
+     --security-group-ids sg-xxxxxxxx
+   ```
 
-## License
+2. **Install Dependencies**
+   ```bash
+   # Update system
+   sudo apt-get update
+   sudo apt-get upgrade -y
 
-MIT License 
+   # Install Ruby dependencies
+   sudo apt-get install -y ruby ruby-dev build-essential
+   ```
+
+3. **Configure Environment**
+   ```bash
+   # Create application directory
+   mkdir -p /opt/webhook-handlers
+   cd /opt/webhook-handlers
+
+   # Clone repository
+   git clone <repository-url> .
+
+   # Set up environment variables
+   sudo nano .env
+   ```
+
+4. **Set Up Systemd Service**
+   Create a service file:
+
+   ```bash
+   sudo nano /etc/systemd/system/webhook-jira.service
+   ```
+
+   ```ini
+   [Unit]
+   Description=Last9 Jira Webhook Handler
+   After=network.target
+
+   [Service]
+   User=ubuntu
+   WorkingDirectory=/opt/webhook-handlers/ruby_example_jira
+   Environment="PATH=/opt/webhook-handlers/ruby_example_jira/.bundle/bin"
+   ExecStart=/usr/bin/bundle exec ruby server.rb
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+5. **Start Service**
+   ```bash
+   # Enable and start service
+   sudo systemctl daemon-reload
+   sudo systemctl enable webhook-jira
+   sudo systemctl start webhook-jira
+
+   # Check status
+   sudo systemctl status webhook-jira
+   ```
+
