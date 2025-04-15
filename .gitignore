@@ -7,7 +7,6 @@ node_example_msteams/yarn-error.log
 # Environment variables
 .env
 **/.env
-**/.env.*
 **/.env.local
 **/.env.*.local
 
