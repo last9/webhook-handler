@@ -10,3 +10,7 @@ Example written in node js for webhook handler that sends notification to MS tea
 ## Google Chat Integration Using Ruby
 Example written in ruby for webhook handler that sends notification to Google Chat: 
 ```webhook-handler/ruby_example_gchat```
+
+## JIRA Integration Using Ruby
+Example written in ruby for webhook handler that creates task in JIRA: 
+```webhook-handler/ruby_example_jira```
