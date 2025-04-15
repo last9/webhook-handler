@@ -1,0 +1,31 @@
+# Dependencies
+node_example/node_modules/
+node_example/npm-debug.log
+node_example/yarn-debug.log
+node_example/yarn-error.log
+
+# Environment variables
+node_example/.env
+node_example/.env.local
+node_example/.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# Build
+dist/
+build/ 
