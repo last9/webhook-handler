@@ -43,4 +43,21 @@ coverage/
 
 # Build
 dist/
-build/ 
+build/
+
+# Ruby specific
+ruby_example_jira/.env
+ruby_example_jira/.bundle/
+ruby_example_jira/vendor/
+ruby_example_jira/*.gem
+ruby_example_jira/*.gemfile.lock
+ruby_example_jira/.ruby-version
+ruby_example_jira/.ruby-gemset
+ruby_example_jira/.byebug_history
+ruby_example_jira/log/*.log
+ruby_example_jira/tmp/
+ruby_example_jira/.idea/
+ruby_example_jira/.vscode/
+
+# Keep the test script
+!ruby_example_jira/test_webhook.sh 
