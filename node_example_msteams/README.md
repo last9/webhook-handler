@@ -1,4 +1,4 @@
-# Webhook Handler
+# Microsoft Teams Webhook Handler
 
 A webhook handler service that processes alerts and forwards them to Microsoft Teams.
 
@@ -18,20 +18,20 @@ A webhook handler service that processes alerts and forwards them to Microsoft T
 ## Installation
 
 1. Clone the repository
-2. Install dependencies:
+2. Navigate to the `node_example_msteams` directory
+3. Install dependencies:
    ```bash
    npm install
    ```
-3. Copy `.env.example` to `.env` and configure your environment variable
+4. Copy `.env.example` to `.env` and configure your environment variables:
 ```bash
 PORT=3000
 TEAMS_WEBHOOK_URL=your-teams-webhook-url
 ```
-4. Start the server:
+5. Start the server:
    ```bash
    npm start
    ```
-
 
 ## API Endpoints
 

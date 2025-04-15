@@ -1,13 +1,28 @@
 # Dependencies
-node_example/node_modules/
-node_example/npm-debug.log
-node_example/yarn-debug.log
-node_example/yarn-error.log
+node_example_msteams/node_modules/
+node_example_msteams/npm-debug.log
+node_example_msteams/yarn-debug.log
+node_example_msteams/yarn-error.log
 
 # Environment variables
-node_example/.env
-node_example/.env.local
-node_example/.env.*.local
+.env
+ruby_example_gchat/.env
+node_example_msteams/.env
+node_example_msteams/.env.local
+node_example_msteams/.env.*.local
+
+# Ruby specific (relative to ruby_example_gchat/)
+ruby_example_gchat/*.gem
+ruby_example_gchat/*.rbc
+ruby_example_gchat/.config
+ruby_example_gchat/coverage/
+ruby_example_gchat/InstalledFiles
+ruby_example_gchat/pkg/
+ruby_example_gchat/spec/reports/
+ruby_example_gchat/spec/examples.txt
+ruby_example_gchat/test/tmp/
+ruby_example_gchat/test/version_tmp/
+ruby_example_gchat/tmp/
 
 # IDE
 .idea/
