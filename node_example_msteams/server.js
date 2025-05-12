@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
@@ -16,7 +17,44 @@ function logPayloadToStdout(payload) {
 
 // Function to format Webhook payload for MS Teams
 function formatForMsTeams(payload) {
-  // Extract relevant information from the Webhook payload
+  // Check if this is a resolve payload
+  if (payload.event_action === 'resolve') {
+    // Extract resolve payload details
+    const eventAction = payload.event_action;
+    const dedupKey = payload.dedup_key || 'N/A';
+    const routingKey = payload.routing_key || 'N/A';
+
+    // Create MS Teams message card for resolve
+    return {
+      "@type": "MessageCard",
+      "@context": "http://schema.org/extensions",
+      "themeColor": "#00FF00", // Green for resolve
+      "summary": "Alert RESOLVED",
+      "title": "Alert RESOLVED",
+      "sections": [
+        {
+          "activityTitle": "Alert Resolved",
+          "facts": [
+            {
+              "name": "Event Action",
+              "value": eventAction.toUpperCase()
+            },
+            {
+              "name": "Dedup Key",
+              "value": dedupKey
+            },
+            {
+              "name": "Routing Key",
+              "value": routingKey
+            }
+          ],
+          "markdown": true
+        }
+      ]
+    };
+  }
+
+  // Handle original payload format
   const alert = payload.payload;
   const eventAction = payload.event_action;
   const links = payload.links || [];
@@ -151,20 +189,21 @@ app.post('/webhook', async (req, res) => {
     console.log(JSON.stringify(teamsPayload, null, 2));
     
     // Here you would send the payload to MS Teams
-    // Uncomment and configure the below section to actually send to Teams
-    /*
     const TEAMS_WEBHOOK_URL = process.env.TEAMS_WEBHOOK_URL;
     if (!TEAMS_WEBHOOK_URL) {
       console.error('MS Teams webhook URL not configured');
-    } else {
-      try {
-        await axios.post(TEAMS_WEBHOOK_URL, teamsPayload);
-        console.log('Successfully sent alert to MS Teams');
-      } catch (error) {
-        console.error('Failed to send to MS Teams:', error.message);
-      }
+      return res.status(500).json({ status: 'error', message: 'MS Teams webhook URL not configured' });
     }
-    */
+
+    try {
+      const response = await axios.post(TEAMS_WEBHOOK_URL, teamsPayload);
+      console.log('Response body:', response.data);
+      console.log('Response headers:', response.headers);
+      console.log('Successfully sent alert to MS Teams');
+    } catch (error) {
+      console.error('Failed to send to MS Teams:', error.message);
+      return res.status(500).json({ status: 'error', message: `Failed to send to MS Teams: ${error.message}` });
+    }
     
     // Return success response
     res.status(200).json({ status: 'success', message: 'Alert processed successfully' });

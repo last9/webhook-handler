@@ -66,3 +66,5 @@ ruby_example_jira/.vscode/
 
 # Keep the test script
 !ruby_example_jira/test_webhook.sh 
+
+test_workload.txt

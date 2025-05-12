@@ -1,6 +1,6 @@
-# Microsoft Teams Webhook Handler
+# Node.js Webhook Handler for MS Teams
 
-A webhook handler service that processes alerts and forwards them to Microsoft Teams.
+This project is a simple webhook handler that receives alerts and forwards them to Microsoft Teams.
 
 ## Features
 
@@ -11,53 +11,99 @@ A webhook handler service that processes alerts and forwards them to Microsoft T
 
 ## Prerequisites
 
-- Node.js (version X.X.X)
-- npm (version X.X.X)
+- Node.js 18 or higher
+- npm (Node Package Manager)
+- Docker (optional
 - Microsoft Teams channel with Incoming Webhook connector
 
 ## Installation
 
-1. Clone the repository
-2. Navigate to the `node_example_msteams` directory
-3. Install dependencies:
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd node_example_msteams
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
-4. Copy `.env.example` to `.env` and configure your environment variables:
-```bash
-PORT=3000
-TEAMS_WEBHOOK_URL=your-teams-webhook-url
-```
-5. Start the server:
+
+3. Create a `.env` file based on `.env.example`:
    ```bash
-   npm start
+   cp .env.example .env
    ```
+
+4. Update the `.env` file with your MS Teams webhook URL:
+   ```
+   TEAMS_WEBHOOK_URL=your_teams_webhook_url
+   ```
+
+## Running the Server
+
+### Using Node.js
+
+1. Start the server:
+   ```bash
+   node server.js
+   ```
+
+2. The server will be running on `http://localhost:3000`.
+
+### Using Docker
+
+1. Build the Docker image:
+   ```bash
+   docker build -t node_example_msteams .
+   ```
+
+2. Run the Docker container with environment variables:
+   ```bash
+   docker run -p 3000:3000 --env-file .env node_example_msteams
+   ```
+
+3. The server will be running on `http://localhost:3000`.
+
+## Testing the Webhook
+
+You can test the webhook using the provided `test_webhook.sh` script:
+
+```bash
+./test_webhook.sh
+```
+
+Or manually send a test payload using curl:
+
+```bash
+curl -X POST http://localhost:3000/webhook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_action": "triggered",
+    "payload": {
+      "summary": "Service Degradation",
+      "severity": "major",
+      "source": "application-monitor",
+      "description": "Response time increased by 200%",
+      "custom_details": {
+        "service": "api-gateway",
+        "response_time": "2.5s",
+        "error_rate": "5%",
+        "affected_users": "1000",
+        "region": "eu-west-1"
+      }
+    }
+  }'
+```
+
+## .env.example Template
+
+```
+TEAMS_WEBHOOK_URL=your_teams_webhook_url
+```
+
+Replace `your_teams_webhook_url` with your actual MS Teams webhook URL.
 
 ## API Endpoints
 
 - `POST /webhook` - Receive webhook alerts
 - `GET /health` - Health check endpoint
-
-## Testing
-You can test the webhook by sending a sample payload:
-```bash
-curl -X POST \
-  http://localhost:3000/webhook \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "payload": {
-    "summary": "Test Alert",
-    "timestamp": "2023-04-15T08:42:58.315+0000",
-    "severity": "critical",
-    "source": "test-server.example.com",
-    "component": "test",
-    "group": "test-group",
-    "class": "test-class",
-    "custom_details": {
-      "free space": "1%"
-    }
-  },
-  "event_action": "trigger"
-}'
-```
-The server should log the payload to stdout and show the formatted MS Teams payload.
