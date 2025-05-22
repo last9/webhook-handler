@@ -38,9 +38,9 @@ app.use(bodyParser.json());
 const teamWebhooks = new Map();
 const teamCredentials = new Map();
 
-// Admin credentials
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'password123';
+// Admin credentials from environment variables with fallback
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password123';
 
 // Function to log payload to stdout and file
 function logPayloadToStdout(payload) {

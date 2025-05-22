@@ -1,109 +1,133 @@
-# Node.js Webhook Handler for MS Teams
+# MS Teams Webhook Handler
 
-This project is a simple webhook handler that receives alerts and forwards them to Microsoft Teams.
+A Node.js application that handles webhook notifications and forwards them to Microsoft Teams channels.
 
 ## Features
 
-- Receives webhook alerts
-- Formats alerts for Microsoft Teams
+- Dynamic team registration with authentication
+- Secure admin and team-specific authentication
+- MS Teams message formatting
+- Comprehensive logging
 - Health check endpoint
-- Configurable through environment variables
+- Docker support
 
 ## Prerequisites
 
 - Node.js 18 or higher
-- npm (Node Package Manager)
-- Docker (optional
-- Microsoft Teams channel with Incoming Webhook connector
+- Docker (for containerized deployment)
+- Microsoft Teams webhook URL
 
-## Installation
+## Environment Variables
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd node_example_msteams
-   ```
+Create a `.env` file in the project root with the following variables:
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```env
+# Admin credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_secure_password
 
-3. Create a `.env` file based on `.env.example`:
-   ```bash
-   cp .env.example .env
-   ```
+# Server configuration
+PORT=3000
 
-4. Update the `.env` file with your MS Teams webhook URL:
-   ```
-   TEAMS_WEBHOOK_URL=your_teams_webhook_url
-   ```
-
-## Running the Server
-
-### Using Node.js
-
-1. Start the server:
-   ```bash
-   node server.js
-   ```
-
-2. The server will be running on `http://localhost:3000`.
-
-### Using Docker
-
-1. Build the Docker image:
-   ```bash
-   docker build -t node_example_msteams .
-   ```
-
-2. Run the Docker container with environment variables:
-   ```bash
-   docker run -p 3000:3000 --env-file .env node_example_msteams
-   ```
-
-3. The server will be running on `http://localhost:3000`.
-
-## Testing the Webhook
-
-You can test the webhook using the provided `test_webhook.sh` script:
-
-```bash
-./test_webhook.sh
+# Logging configuration
+LOG_LEVEL=info
 ```
 
-Or manually send a test payload using curl:
+## Running with Docker
 
+1. Build the Docker image:
 ```bash
-curl -X POST http://localhost:3000/webhook \
+docker build -t webhook-handler .
+```
+
+2. Create a logs directory on your host:
+```bash
+mkdir -p ~/webhook-logs
+```
+
+3. Run the container:
+```bash
+docker run -d \
+  -p 3000:3000 \
+  -v ~/webhook-logs:/app/logs \
+  -e ADMIN_USERNAME=your_admin_username \
+  -e ADMIN_PASSWORD=your_admin_password \
+  --name webhook-handler \
+  webhook-handler
+```
+
+## API Endpoints
+
+### Register a Team (Admin only)
+```bash
+curl -X POST http://localhost:3000/register \
   -H "Content-Type: application/json" \
+  -H "X-Username: team1user" \
+  -H "X-Password: team1pass" \
+  -u admin:password123 \
   -d '{
-    "event_action": "triggered",
+    "teamId": "team1",
+    "webhookUrl": "https://your-teams-webhook-url"
+  }'
+```
+
+### Send Alert to Team
+```bash
+curl -X POST http://localhost:3000/team1 \
+  -H "Content-Type: application/json" \
+  -u team1user:team1pass \
+  -d '{
+    "event_action": "trigger",
     "payload": {
-      "summary": "Service Degradation",
-      "severity": "major",
-      "source": "application-monitor",
-      "description": "Response time increased by 200%",
-      "custom_details": {
-        "service": "api-gateway",
-        "response_time": "2.5s",
-        "error_rate": "5%",
-        "affected_users": "1000",
-        "region": "eu-west-1"
-      }
+      "summary": "Test Alert",
+      "severity": "critical",
+      "source": "Test System"
     }
   }'
 ```
 
-## .env.example Template
-
+### List Registered Teams (Admin only)
+```bash
+curl -u admin:password123 http://localhost:3000/teams
 ```
-TEAMS_WEBHOOK_URL=your_teams_webhook_url
+
+### Health Check
+```bash
+curl http://localhost:3000/health
 ```
 
-Replace `your_teams_webhook_url` with your actual MS Teams webhook URL.
+## Logs
 
-## API Endpoints
+Logs are written to three files in the mounted volume (`~/webhook-logs`):
 
-- `POST /webhook` - Receive webhook alerts
-- `GET /health` - Health check endpoint
+- `access.log`: General access logs
+- `error.log`: Error logs
+- `payload.log`: Webhook payload logs
+
+View logs in real-time:
+```bash
+tail -f ~/webhook-logs/*.log
+```
+
+## Security Notes
+
+1. Always use strong passwords for admin and team credentials
+2. Use HTTPS in production
+3. Regularly rotate credentials
+4. Monitor logs for suspicious activity
+
+## Development
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the server:
+```bash
+npm start
+```
+
+## License
+
+MIT
