@@ -5,9 +5,10 @@ const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 443;
 
 // Configure logging
 const logDir = path.join(__dirname, 'logs');
@@ -350,8 +351,13 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'up' });
 });
 
-// Start the server
-app.listen(PORT, () => {
+// Start the server with HTTPS
+const options = {
+    key: fs.readFileSync('/app/certs/private.key'),
+    cert: fs.readFileSync('/app/certs/certificate.crt')
+};
+
+https.createServer(options, app).listen(PORT, () => {
     writeToLog(accessLogStream, `Webhook Server Started on port ${PORT}`);
     console.log(`\n=== Webhook Server Started ===`);
     console.log(`Listening on port ${PORT}`);
