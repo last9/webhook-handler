@@ -248,25 +248,6 @@ const adminAuth = basicAuth({
   realm: 'Admin Area'
 });
 
-// Team authentication middleware
-const teamAuth = (req, res, next) => {
-  const teamId = req.params.teamId;
-  const credentials = teamCredentials.get(teamId);
-  
-  if (!credentials) {
-    logError(`Team not found: ${teamId}`);
-    return res.status(404).json({ error: 'Team not found' });
-  }
-
-  const auth = basicAuth({
-    users: { [credentials.username]: credentials.password },
-    challenge: true,
-    realm: `Team ${teamId} Area`
-  });
-
-  auth(req, res, next);
-};
-
 // Register a new team webhook (admin only)
 app.post('/register', adminAuth, (req, res) => {
     writeToLog(accessLogStream, 'Team Registration Request', {
@@ -296,8 +277,8 @@ app.post('/register', adminAuth, (req, res) => {
     teamWebhooks.set(teamId, webhookUrl);
     teamCredentials.set(teamId, { username, password });
     
-    // Create a dynamic route for this team
-    app.post(`/:teamId`, teamAuth, async (req, res) => {
+    // Create a dynamic route for this team (no auth required)
+    app.post(`/:teamId`, async (req, res) => {
         try {
             const teamId = req.params.teamId;
             writeToLog(accessLogStream, `Processing Alert for Team ${teamId}`);
@@ -343,7 +324,7 @@ app.get('/teams', adminAuth, (req, res) => {
     res.json({ teams });
 });
 
-// Health check endpoint
+// Health check endpoint (no auth required)
 app.get('/health', (req, res) => {
     writeToLog(accessLogStream, 'Health Check');
     console.log('\n=== Health Check ===');
